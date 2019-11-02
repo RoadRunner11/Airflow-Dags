@@ -4,6 +4,7 @@ from airflow.models import Variable
 from airflow.operators.bash_operator import BashOperator
 from tasks.operators.airflow_variable_sensor_operator import AirflowVariableSensorOperator
 import airflow
+from dateutil import parser
 
 # Define the DAG
 with DAG(
@@ -12,10 +13,15 @@ with DAG(
     schedule_interval=None
 ) as dag:
 
-    def variable_checker() -> bool:
-        signal_match = Variable.get('signal_match', default_var=0)
-        if signal_match:  # pass
-            return True
+    def variable_checker(**kwargs) -> bool:
+        execution_time = (parser
+                          .parse(kwargs['ts'])
+                          .replace(tzinfo=None, hour=0, minute=0)
+                          .strftime('%Y%m%d_%H%M'))
+        signal_match = Variable.get('example.airflow_variable_operator', default_var='')
+        if signal_match:
+            if execution_time <= signal_match:  # pass
+                return True
         return False
 
     set_airflow_variable_op = AirflowVariableSensorOperator(

@@ -13,6 +13,6 @@ with DAG(
 ) as dag:
     set_airflow_variable_op = AirflowVariableOperator(
         task_id='set_airflow_variable',
-        variable_name='last_signal_updated_at',
-        variable_value=datetime.now().strftime('%Y-%m-%d_%H')
+        variable_name='example.airflow_variable_operator',
+        variable_value=datetime.now().strftime('%Y%m%d_%H%M')
     )
